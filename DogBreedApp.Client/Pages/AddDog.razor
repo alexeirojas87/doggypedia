@@ -1,0 +1,164 @@
+﻿@page "/adddog"
+@using DogBreedApp.Client.Services.Interfaces;
+@using DogBreedApp.Shared.DTO
+@using DogBreedApp.Client.Services
+@using DogBreedApp.Client.Components
+@inject IBreedService BreedService
+@inject IDogService DogService
+@inject IDialogService DialogService
+@using System.ComponentModel.DataAnnotations
+@inject ISnackbar Snackbar
+
+<MudCard>
+    <MudCardHeader>
+        <CardHeaderContent>
+            <MudText Typo="Typo.h6">Add Dog</MudText>
+        </CardHeaderContent>
+        <CardHeaderActions>
+            <MudIconButton Icon="@Icons.Material.Filled.Add" Color="Color.Default" />
+        </CardHeaderActions>
+    </MudCardHeader>
+    <MudCardContent>
+        <MudTextField @bind-Value="_dog.Name" Label="Name" Variant="Variant.Outlined" For="@(() => _dog.Name)" Class="ml-auto mt-3 mb-3" />
+            
+        <MudAutocomplete T="BreedDto" Label="Raza" @bind-Value="_breed" SearchFunc="@Search1" ToStringFunc="@(e=> e==null?null : $"{e.Name}")"
+                                 Required="true" Class="ml-auto mt-3 mb-3" />
+        
+        <MudTextField @bind-Value="_dog.Sex" Label="Sex" Variant="Variant.Outlined" Class="ml-auto mt-3 mb-3" />
+        <MudDatePicker Label="Fecha Nacimiento" @bind-Date="_dog.BirthDate" Class="ml-auto mt-3 mb-3" />
+        <MudCheckBox Label="Perro Master" Color="Color.Secondary" CheckedChanged="@((bool isChecked) => OnMasterChanged(isChecked))" Class="ml-auto mt-3 mb-3" />
+        <MudCheckBox Label="Escoger progenitores" CheckedChanged="@((bool isChecked) => OnProgenitoresChanged(isChecked))" Class="ml-auto mt-3 mb-3" />
+
+        <MudDialog>
+            <DialogContent>
+                <MudSelect Label="Dogs of selected breed" T="DogDto" MultiSelection="true" @bind-Values="_selectedDogs">
+                    @if (_dogs != null)
+                    {
+                        @foreach (var dog in _dogs)
+                        {
+                            <MudSelectItem Value="@dog" Disabled="@(!CanSelectDog(dog))">@($"{dog.Name} ({dog.Sex})")</MudSelectItem>
+                        }
+                    }
+                </MudSelect>
+            </DialogContent>
+            <DialogActions>
+                <MudButton OnClick="Cancel">Cancel</MudButton>
+                <MudButton Color="Color.Primary" OnClick="Submit">Ok</MudButton>
+            </DialogActions>
+        </MudDialog>
+
+
+    </MudCardContent>
+    <MudCardActions>
+        <MudButton ButtonType="ButtonType.Submit" Color="Color.Primary" OnClick="AddNewDog">Add Dog</MudButton>
+    </MudCardActions>
+</MudCard>
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+    private List<string> _validationErrors = new List<string>();
+    private MudForm form;
+    private string _searchString;
+    private DogDto _dog = new();
+    private BreedDto _breed = new();
+    private MudForm _form;
+    private static IEnumerable<BreedDto> _breeds;
+    bool progenitores = false;
+    private DogDto _selectedDog;
+    private List<DogDto> _selectedDogs = new List<DogDto>();
+    private List<DogDto> _dogs = new List<DogDto>();
+    public bool perroMaster { get; set; } = true;
+    public bool _showDogsDialog { get; set; } = false;
+    void Submit() => MudDialog.Close(DialogResult.Ok(true));
+    void Cancel() => MudDialog.Cancel();
+    private bool showSearchField;   
+
+    private string Validate()
+    {
+        if (_breed is null || string.IsNullOrWhiteSpace(_breed.Name))
+            return "The breed field is required";
+
+        return !_breeds.Any(b => b.Name.Contains(_breed.Name, StringComparison.OrdinalIgnoreCase))
+            ? "The breed value is incorrect"
+            : string.Empty;
+    }
+    private async Task<IEnumerable<BreedDto>> Search1(string value)
+    {
+        // if text is null or empty, show complete list
+        if (string.IsNullOrEmpty(value))
+            return _breeds;
+        return _breeds.Where(x => x.Name.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+    }
+
+    private void ToggleSearchField()
+    {
+        showSearchField = !showSearchField;
+    }
+    private bool _searchFieldVisible;
+    private string GetSearchFieldVisibilityClass()
+    {
+        return _searchFieldVisible ? "" : "hidden";
+    }
+    private bool CanSelectDog(DogDto dog)
+    {
+        if (_selectedDogs.Count == 0) return true;
+        if (_selectedDogs.Count == 1) return _selectedDogs[0].Sex != dog.Sex;
+        return false;
+    }
+    protected override async Task OnInitializedAsync()
+    {
+        _breeds = await BreedService.GetBreedsAsync();
+        _dog.BreedName = string.Empty;
+    }
+    private void CloseDogsDialog()
+    {
+        progenitores = false;
+    }
+    private void OnMasterChanged(bool isChecked)
+    {
+        perroMaster = isChecked;
+        progenitores = perroMaster ? false : true;
+        StateHasChanged();
+    }
+    private async Task OnProgenitoresChanged(bool isChecked)
+    {
+        _showDogsDialog = isChecked;
+        if (_showDogsDialog)
+        {
+            _dogs = await DogService.GetDogsByBreedAsync(_dog.BreedId);
+
+            var parameters = new DialogParameters { ["_dogs"] = _dogs };
+            var maxWidth = new DialogOptions() { MaxWidth = MaxWidth.Medium, FullWidth = true, DisableBackdropClick = true };
+            var options = new DialogOptions { CloseOnEscapeKey = true };
+            DialogService.Show<DogsSelectedBreedDialog>("Progenitores", parameters, maxWidth);
+        }
+        else
+        {
+            _dogs.Clear();
+        }
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task AddNewDog()
+    {
+        var validateValue = Validate();
+        if (string.IsNullOrEmpty(validateValue))
+        {
+            if (perroMaster)
+            {
+                _dog.FatherId = 0;
+                _dog.MotherId = 0;
+            }
+            _dog.BreedId = _breed.Id;
+            await DogService.AddDogAsync(_dog);
+            _dog = new();
+            _form.Reset();
+            StateHasChanged();
+        }
+        else
+        {
+            Snackbar.Add(validateValue, Severity.Error);
+        }
+
+    }
+}

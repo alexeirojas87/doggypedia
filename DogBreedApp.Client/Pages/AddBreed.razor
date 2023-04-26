@@ -1,0 +1,29 @@
+﻿@page "/addbreed"
+@using DogBreedApp.Client.Services.Interfaces;
+@using DogBreedApp.Shared.DTO
+@using DogBreedApp.Client.Services
+@inject IBreedService BreedService
+
+<h1>Agregar raza de perro</h1>
+
+<EditForm Model="NewBreed" OnValidSubmit="AddNewBreed">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="form-group">
+        <label for="name">Nombre:</label>
+        <InputText id="name" class="form-control" @bind-Value="NewBreed.Name" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Agregar raza</button>
+</EditForm>
+
+@code {
+    private BreedDto NewBreed { get; set; } = new BreedDto();
+
+    private async Task AddNewBreed()
+    {
+        await BreedService.AddBreedAsync(NewBreed);
+        NewBreed = new BreedDto();
+    }
+}

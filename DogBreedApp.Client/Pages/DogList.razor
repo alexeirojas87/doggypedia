@@ -1,0 +1,24 @@
+﻿@page "/doglist"
+@using DogBreedApp.Client.Services
+@using DogBreedApp.Client.Services.Interfaces;
+@using DogBreedApp.Shared.DTO
+@inject IDogService DogService
+
+<h3>Dog List</h3>
+<MudDataGrid Items="_dogs">
+    <Columns>
+        <PropertyColumn Property="x => x.Name" Title="Nr" />
+        <PropertyColumn Property="x => x.Sex" />
+        <PropertyColumn Property="x => x.BreedName" />
+        <PropertyColumn Property="x => x.BirthDate" />
+    </Columns>
+</MudDataGrid>
+
+@code {
+    private List<DogDto> _dogs = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        _dogs = await DogService.GetDogsAsync();
+    }
+}

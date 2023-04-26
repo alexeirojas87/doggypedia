@@ -1,0 +1,43 @@
+﻿@page "/breeds"
+@using DogBreedApp.Client.Services.Interfaces;
+@using DogBreedApp.Shared.DTO
+@using DogBreedApp.Client.Services
+@inject IBreedService BreedService
+
+<h1>Razas de perros</h1>
+
+@if (_breeds == null)
+{
+    <p><em>Cargando...</em></p>
+}
+else
+{
+    @*<ul>
+        @foreach (var breed in _breeds)
+        {
+            <li>@breed.Name</li>
+        }
+    </ul>*@
+<MudTabs Elevation="1" Variant="Variant.Text">
+    <MudTabPanel Text="Breeds">
+        <MudList>
+            @foreach (var breed in _breeds)
+            {
+                <MudListItem>
+                    @breed.Name
+                    <MudBadge Color="Color.Primary" Variant="Variant.Filled" Dot="false" Label="@breed.DogCount" />
+                </MudListItem>
+            }
+        </MudList>
+    </MudTabPanel>
+</MudTabs>
+}
+
+@code {
+    private IEnumerable<BreedDto> _breeds;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _breeds = await BreedService.GetBreedsAsync();
+    }
+}

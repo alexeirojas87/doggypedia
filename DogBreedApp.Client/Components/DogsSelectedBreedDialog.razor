@@ -1,0 +1,41 @@
+﻿@namespace DogBreedApp.Client.Components
+@using DogBreedApp.Shared.DTO
+<MudDialog>
+    <DialogContent>
+        <MudSelect Label="Perros de la raza seleccionada" T="DogDto" MultiSelection="true" @bind-Values="_selectedDogs">
+            <MudSpacer />
+            <MudTextField @bind-Value="_searchString" Placeholder="Search" Adornment="Adornment.Start" Immediate="true"
+                          AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+            @if (_dogs != null)
+            {
+                @foreach (var dog in _dogs)
+                {
+                    if (string.IsNullOrEmpty(_searchString) || dog.Name.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+                    {
+                        <MudSelectItem Value="@dog" Disabled="@(!CanSelectDog(dog))">@($"{dog.Name} ({dog.Sex})")</MudSelectItem>
+                    }
+                }
+
+            }
+        </MudSelect>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Primary" OnClick="Submit">Ok</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+    private string _searchString;
+    private List<DogDto> _selectedDogs = new List<DogDto>();
+    [Parameter] public List<DogDto> _dogs { get; set; } = new List<DogDto>();
+    private bool CanSelectDog(DogDto dog)
+    {
+        if (_selectedDogs.Count == 0) return true;
+        if (_selectedDogs.Count == 1) return _selectedDogs[0].Sex != dog.Sex;
+        return false;
+    }
+    void Submit() => MudDialog.Close(DialogResult.Ok(true));
+    void Cancel() => MudDialog.Cancel();
+}
