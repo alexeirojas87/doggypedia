@@ -21,7 +21,7 @@
     <MudCardContent>
         <MudTextField @bind-Value="_dog.Name" Label="Name" Variant="Variant.Outlined" For="@(() => _dog.Name)" Class="ml-auto mt-3 mb-3" />
             
-        <MudAutocomplete T="BreedDto" Label="Raza" @bind-Value="_breed" SearchFunc="@Search1" ToStringFunc="@(e=> e==null?null : $"{e.Name}")"
+        <MudAutocomplete T="BreedDto" Label="Raza" @bind-Value="_breed" SearchFunc="@SearchBreed" ToStringFunc="@(e=> e==null?null : $"{e.Name}")"
                                  Required="true" Class="ml-auto mt-3 mb-3" />
         
         <MudTextField @bind-Value="_dog.Sex" Label="Sex" Variant="Variant.Outlined" Class="ml-auto mt-3 mb-3" />
@@ -82,7 +82,7 @@
             ? "The breed value is incorrect"
             : string.Empty;
     }
-    private async Task<IEnumerable<BreedDto>> Search1(string value)
+    private async Task<IEnumerable<BreedDto>> SearchBreed(string value)
     {
         // if text is null or empty, show complete list
         if (string.IsNullOrEmpty(value))
