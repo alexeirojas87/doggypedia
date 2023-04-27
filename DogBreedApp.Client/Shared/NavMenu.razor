@@ -1,27 +1,16 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
+﻿<div class="ps-3 navbar indigo darken-3 mud-elevation-25" style="box-shadow: -5px 4px 6px rgba(255, 215, 0, 0.8), -2px 1px 3px rgba(255, 215, 0, 0.6);">
     <div class="container-fluid">
-        <a class="navbar-brand" href="">DogBreedApp.Client</a>
-        <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
-            <span class="navbar-toggler-icon"></span>
+        <a class="navbar-brand m-0" href="" style="color: #FFFF00 !important;">
+            <MudIcon Icon="@Icons.Material.Filled.Pets" class="mr-3"></MudIcon>
+            DoggyPedia
+        </a>
+        <button title="Navigation menu" class="navbar-toggler text-white" @onclick="ToggleNavMenu">
+            <span class="navbar-toggler-icon" style="background-image: url('data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 30 30\'%3E%3Cpath stroke=\'rgba(255, 255, 255, 1)\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-miterlimit=\'10\' d=\'M4 7h22M4 15h22M4 23h22\'/%3E%3C/svg%3E')"></span>
         </button>
     </div>
 </div>
-@*<MudPaper Class="py-3" Elevation="0" Style="@($"background:{Theme.Palette.ActionDefault};")">
-    <MudNavMenu>
-        <MudText Typo="Typo.h6" Class="px-4">Doggypedia</MudText>
-        <MudDivider Class="my-2" />
-        <MudNavLink Href="NavLinkMatch.All">Dashboard</MudNavLink>
-        <MudNavLink Href="/servers">Servers</MudNavLink>
-        <MudNavLink Href="/billing" Disabled="true">Billing</MudNavLink>
-        <MudNavGroup Title="Settings" Expanded="true">
-            <MudNavLink Href="/users">Users</MudNavLink>
-            <MudNavLink Href="/security">Security</MudNavLink>
-        </MudNavGroup>
-        <MudNavLink Href="/about">About</MudNavLink>
-    </MudNavMenu>
-</MudPaper>
-*@
-<div class="@NavMenuCssClass nav-scrollable" @onclick="ToggleNavMenu">
+
+<div class="@NavMenuCssClass nav-scrollable indigo" @onclick="ToggleNavMenu">
     <nav class="flex-column">
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
