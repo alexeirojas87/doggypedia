@@ -6,7 +6,21 @@
         </button>
     </div>
 </div>
-
+@*<MudPaper Class="py-3" Elevation="0" Style="@($"background:{Theme.Palette.ActionDefault};")">
+    <MudNavMenu>
+        <MudText Typo="Typo.h6" Class="px-4">Doggypedia</MudText>
+        <MudDivider Class="my-2" />
+        <MudNavLink Href="NavLinkMatch.All">Dashboard</MudNavLink>
+        <MudNavLink Href="/servers">Servers</MudNavLink>
+        <MudNavLink Href="/billing" Disabled="true">Billing</MudNavLink>
+        <MudNavGroup Title="Settings" Expanded="true">
+            <MudNavLink Href="/users">Users</MudNavLink>
+            <MudNavLink Href="/security">Security</MudNavLink>
+        </MudNavGroup>
+        <MudNavLink Href="/about">About</MudNavLink>
+    </MudNavMenu>
+</MudPaper>
+*@
 <div class="@NavMenuCssClass nav-scrollable" @onclick="ToggleNavMenu">
     <nav class="flex-column">
         <div class="nav-item px-3">
@@ -15,45 +29,67 @@
             </NavLink>
         </div>
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="counter">
-                <span class="oi oi-plus" aria-hidden="true"></span> Counter
-            </NavLink>
+            <MudExpansionPanel Class="rounded" Style="background-color: rgba(255,255,255,0.25); color: white;">
+                <TitleContent>
+                    <div class="d-flex" style="margin: -10px;">
+                        <MudIcon Icon="@Icons.Material.Filled.Assignment" class="mr-3"></MudIcon>
+                        <MudText><strong>Razas</strong></MudText>
+                    </div>
+                </TitleContent>
+                <ChildContent>
+                    <NavLink class="nav-link" href="addbreed">
+                        <span class="oi oi-plus" aria-hidden="true"></span> Agregar raza
+                    </NavLink>
+                    <NavLink class="nav-link" href="breeds">
+                        <span class="oi oi-list-rich" aria-hidden="true"></span> Razas de perros
+                    </NavLink>
+                </ChildContent>
+            </MudExpansionPanel>
         </div>
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="fetchdata">
-                <span class="oi oi-list-rich" aria-hidden="true"></span> Fetch data
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="breeds">
-                <span class="oi oi-list-rich" aria-hidden="true"></span> Razas de perros
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="addbreed">
-                <span class="oi oi-plus" aria-hidden="true"></span> Agregar raza
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="doglist">
-                <span class="oi oi-list-rich" aria-hidden="true"></span> Perros
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="adddog">
-                <span class="oi oi-plus" aria-hidden="true"></span> Agregar Perro
-            </NavLink>
+            <MudExpansionPanel Class="rounded" Style="background-color: rgba(255,255,255,0.25); color: white;">
+                <TitleContent>
+                    <div class="d-flex" style="margin: -10px;">
+                        <MudIcon Icon="@Icons.Material.Filled.Pets" class="mr-3"></MudIcon>
+                        <MudText><strong>Perros</strong></MudText>
+                    </div>
+                </TitleContent>
+                <ChildContent>
+                    <NavLink class="nav-link" href="adddog">
+                        <span class="oi oi-plus" aria-hidden="true"></span> Agregar Perro
+                    </NavLink>
+                    <NavLink class="nav-link" href="doglist">
+                        <span class="oi oi-list-rich" aria-hidden="true"></span> Perros
+                    </NavLink>
+                </ChildContent>
+            </MudExpansionPanel>
         </div>
     </nav>
 </div>
 
 @code {
     private bool collapseNavMenu = true;
-
+    private MudTheme Theme = new MudTheme();
     private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
 
     private void ToggleNavMenu()
     {
         collapseNavMenu = !collapseNavMenu;
+    }
+    private bool isMenuOpen = true;
+
+    private void ToggleMenu()
+    {
+        isMenuOpen = !isMenuOpen;
+        if (!isMenuOpen)
+        {
+            // Acciones adicionales cuando se cierra el menú
+            // Por ejemplo, restablecer el estado de tu aplicación
+        }
+    }
+
+    private void CloseMenu()
+    {
+        isMenuOpen = false;
     }
 }
